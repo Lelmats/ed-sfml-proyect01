@@ -14,7 +14,8 @@ struct Inputs
     Vec2* keyboardAxis;
     Vec2* joystickAxis;
 
-    Inputs(){}
+    //Constructor
+    Inputs(); 
 
     Vec2* GetKeyboardAxis();
     Vec2* GetJoystickAxis();
