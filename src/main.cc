@@ -1,6 +1,5 @@
 #include<iostream>
 #include <SFML/Graphics.hpp>
-
 #include "Inputs.hh"
 #include "Character.hh"
 
@@ -8,10 +7,11 @@
 #define WINDOW_HEIGHT 600
 #define GAME_NAME "Roguelike game"
 #define TILES1 "assets/sprites/tiles1.png"
+#define TILES2 "assets/sprites/tiles2.png"
+#define TILES3 "assets/sprites/tiles3.png"
 #define SPRITE_SCALE 4.f
 #define FPS 144
-#define PLAYER_MOVESPEED 0.4f
-
+#define PLAYER_MOVESPEED 0.3f
 
 int main()
 {
@@ -24,17 +24,31 @@ int main()
     float deltaTime{};
 
     window->setFramerateLimit(FPS);
-
+    //Game inputs
     Inputs* inputs{new Inputs()};
-
+    //Textures
     sf::Texture* tilesTexture1{new sf::Texture()};
     tilesTexture1->loadFromFile(TILES1);
+    sf::Texture* tilesTexture2{new sf::Texture()};
+    tilesTexture2->loadFromFile(TILES2);
+    sf::Texture* tilesTexture3{new sf::Texture()};
+    tilesTexture3->loadFromFile(TILES3);
 
-    Character* character1{new Character(tilesTexture1, 16 * 9, 138, 16, 32, SPRITE_SCALE, SPRITE_SCALE)};
+    sf::Sprite* tileGround1{new sf::Sprite(*tilesTexture3, *(new sf::IntRect(16 * 1, 16 * 0, 16, 16)))};
+    tileGround1->setScale(SPRITE_SCALE, SPRITE_SCALE);
 
-    //sf::Sprite* sprite1{new sf::Sprite(*tilesTexture1, *(new sf::IntRect(16 * 0, 16 * 11, 16, 16)))};
-    //sprite1->setScale(*(new sf::Vector2f(SPRITE_SCALE, SPRITE_SCALE)));
-    //sprite1->setPosition((WINDOW_WIDTH / 2), WINDOW_HEIGHT / 2);
+    //Main player
+    Character* character1{new Character(tilesTexture2, 16 * 1, 16 * 5, 16, 16, SPRITE_SCALE, SPRITE_SCALE)};
+    character1->SetAnimations(
+        new Animation*[2]
+        {
+            new Animation(5, 0, 5, character1->GetSprite(), 40.f),
+            new Animation(6, 0, 5, character1->GetSprite(), 80.f)
+        }
+    );
+
+    //Animation* idle{new Animation(5, 0, 5, character1->GetSprite(), 40.f)};
+    //Animation* run{new Animation(6, 0, 5, character1->GetSprite(), 80.f)};
 
     /*sf::RectangleShape* boxShape{new sf::RectangleShape(*(new sf::Vector2f(100, 100)))};
     boxShape->setPosition((WINDOW_WIDTH / 2), WINDOW_HEIGHT / 2);
@@ -45,6 +59,8 @@ int main()
     sf::CircleShape* pointShape{new sf::CircleShape(2.f)};
     pointShape->setPosition(boxShape->getPosition());
     pointShape->setFillColor(sf::Color::White);*/
+
+    character1->GetSprite()->setPosition(0, 300);
 
     //esto es el loop principal, mientras la ventana este abierta, esto se va ejecutar.
     while (window->isOpen())
@@ -61,36 +77,46 @@ int main()
         
         Vec2* keyboardAxis{inputs->GetKeyboardAxis()};
         Vec2* joystickAxis{inputs->GetJoystickAxis()};
-        //std::cout << "keyboard axis x: " << keyboardAxis->x << " keyboard axis y: " << keyboardAxis->y << std::endl;
-        //std::cout << "joystic axis x: " << joystickAxis->x << " joystic axis y: " << joystickAxis->y << std::endl;
-
-        /*if(sf::Joystick::isConnected(0))
-        {
-            //sf::Vector2f* newPosition{new sf::Vector2f(joystickAxis->x, joystickAxis->y)};
-            //boxShape->setPosition(boxShape->getPosition() + *newPosition);
-            boxShape->move(joystickAxis->x, joystickAxis->y);
-        }
-        else
-        {
-            //sf::Vector2f* newPosition{new sf::Vector2f(keyboardAxis->x, keyboardAxis->y)};
-            //boxShape->setPosition(boxShape->getPosition() + *newPosition);
-            boxShape->move(keyboardAxis->x, keyboardAxis->y);
-        }
-        
-        pointShape->setPosition(boxShape->getPosition());*/
+   
 
         if(sf::Joystick::isConnected(0))
         {
             character1->GetSprite()->move(joystickAxis->x * deltaTime * PLAYER_MOVESPEED, joystickAxis->y * deltaTime * PLAYER_MOVESPEED);
             character1->FlipSpriteX(joystickAxis->x);
+            
+            if(std::abs(joystickAxis->x) > 0 || std::abs(joystickAxis->y) > 0)
+            {
+                //run
+                character1->GetAnimation(1)->Play(deltaTime);
+            }
+            else
+            {
+                //idle
+                character1->GetAnimation(0)->Play(deltaTime);
+            }
         }
         else
         {
             character1->GetSprite()->move(keyboardAxis->x * deltaTime * PLAYER_MOVESPEED, keyboardAxis->y * deltaTime * PLAYER_MOVESPEED);
             character1->FlipSpriteX(keyboardAxis->x);
+
+            if(std::abs(keyboardAxis->x) > 0 || std::abs(keyboardAxis->y) > 0)
+            {
+                //run
+                character1->GetAnimation(1)->Play(deltaTime);
+            }
+            else
+            {
+                //idle
+                character1->GetAnimation(0)->Play(deltaTime);
+            }
         }
 
-        window->clear(sf::Color::Black);//limpiar la pantalla
+        //character1->GetAnimation(0)->Play(deltaTime);
+
+
+        window->clear(*(new sf::Color(150, 100, 0, 255)));//lipiar la pantalla
+        window->draw(*tileGround1);
         window->draw(*character1->GetSprite());
         window->display(); //mostrar en pantalla lo que se va dibujar
 
@@ -98,7 +124,7 @@ int main()
         deltaTime = timeElapsed.asMilliseconds();
         clock->restart();
 
-        std::cout << "delta time: " << deltaTime << std::endl;
+        //std::cout << "delta time: " << deltaTime << std::endl;
 
         delete keyboardAxis;
         delete joystickAxis;

@@ -9,7 +9,6 @@ Character::Character(sf::Texture*& texture, float cropPosX, float cropPosY, floa
     this->cropHeight = cropHeight;
     this->scaleX = scaleX;
     this->scaleY = scaleY;
-
     InitSprite();
 }
 
@@ -36,6 +35,16 @@ void Character::FlipSpriteX(float x)
         sprite->setScale(-scaleX, scaleY);
         sprite->setOrigin(sprite->getGlobalBounds().width / scaleX, 0.f);
     }
+}
+
+void Character::SetAnimations(Animation** animations)
+{
+    this->animations = animations;
+}
+
+Animation* Character::GetAnimation(int index) const
+{
+    return *(animations + index);
 }
 
 Character::~Character(){}
