@@ -1,10 +1,11 @@
-#include <iostream>
+#include<iostream>
 #include <SFML/Graphics.hpp>
-#include <box2d/box2d.h>
+#include<box2d/box2d.h>
 
+#include "Maze.hh"
 #include "Inputs.hh"
 #include "Character.hh"
-
+#include "Tile.hh"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -22,28 +23,19 @@ int main()
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), GAME_NAME);
     //aqui vas a guardar los eventos dentro de la ventana, eje: teclado, mouse, etc.
     sf::Event event;
-    window->setFramerateLimit(FPS);
+  
 
     //physics declaration
     b2Vec2* gravity{new b2Vec2(0.f, 0.f)};
     b2World* world{new b2World(*gravity)}; 
 
-    char** lab
-        {
-            new char*[10]
-            {
-                new char[13]{'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'},
-                new char[13]{'w', 'e', 'r', 'w', 'd', 'i', 'w', 'i', 'r', 'w', 'e', 'r', 'w'},
-                new char[13]{'g', 'g', 'g', 's', 'g', 'k', 'u', 'k', 'g', 'g', 'g', 'g', 'g'},
-                new char[13]{'g', 'g', 'g', 'g', 's', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g'},
-                new char[13]{'s', 'g', 'a', 's', 'g', 'g', 'g', 'g', 'g', 's', 'g', 'g', 'g'},
-                new char[13]{'g', 'g', 'g', 'g', 'g', 'g', 's', 'g', 'g', 'g', 'g', 'g', 'g'},
-                new char[13]{'g', 'g', 'g', 'g', 'g', 'g', 'a', 'g', 's', 'g', 'g', 'g', 'g'},
-                new char[13]{'g', 'g', 's', 'g', 'g', 'g', 'a', 'g', 'g', 'g', 'g', 'g', 'g'},
-                new char[13]{'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'a', 'g', 'g', 'g'},
-                new char[13]{'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g'}
-            }
-        };
+    sf::Clock* clock{new sf::Clock()};
+    float deltaTime{};
+
+    window->setFramerateLimit(FPS);
+
+    //Game inputs
+    Inputs* inputs{new Inputs()};
 
     sf::Texture* tilesTexture1{new sf::Texture()};
     tilesTexture1->loadFromFile(TILES1);
@@ -93,17 +85,55 @@ int main()
     chestCollider->GetBoxShape()->setScale(SPRITE_SCALE, SPRITE_SCALE);
     chestCollider->GetBoxShape()->setPosition(chest->getPosition());
 
-    //chestCollider->GetBoxShape()->setPosition(shinychest->getPosition());
+    
+/*
+    char** lab
+    {
+        new char*[10]
+        {
+            new char[13]{'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'},
+            new char[13]{'w', 'e', 'r', 'w', 'd', 'i', 'w', 'i', 'r', 'w', 'e', 'r', 'w'},
+            new char[13]{'g', 'g', 'g', 's', 'g', 'k', 'u', 'k', 'g', 'g', 'g', 'g', 'g'},
+            new char[13]{'g', 'g', 'g', 'g', 's', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g'},
+            new char[13]{'s', 'g', 'a', 's', 'g', 'g', 'g', 'g', 'g', 's', 'g', 'g', 'g'},
+            new char[13]{'g', 'g', 'g', 'g', 'g', 'g', 's', 'g', 'g', 'g', 'g', 'g', 'g'},
+            new char[13]{'g', 'g', 'g', 'g', 'g', 'g', 'a', 'g', 's', 'g', 'g', 'g', 'g'},
+            new char[13]{'g', 'g', 's', 'g', 'g', 'g', 'a', 'g', 'g', 'g', 'g', 'g', 'g'},
+            new char[13]{'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'a', 'g', 'g', 'g'},
+            new char[13]{'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g'}
+        }
+    };
+*/
+    /*std::ifstream* reader{new std::ifstream()};
+    reader->open("assets/mazes/maze1.txt");
 
-    //Maze
-    std::vector<sf::Sprite> Spritemaze;
+    unsigned int N{10}, M{13};
 
+    char** tiles{new char*[N]};
+
+    //reservando memoria, dentro del array
+    for(int i{}; i < N; i++)
+    {
+        tiles[i] = new char[M];
+    }
+
+    for(int i{}; i < N; i++)
+    {
+        for(int j{}; j < M; j++)
+        {
+            *reader >> tiles[i][j];
+        }
+    }*/
+
+
+/*
     for (int i ={}; i < 10; i++)
     {
         for (int j = 0; j < 13; j++)
         {
-        char& l = *(*(lab + i) + j);
-           switch (l)
+        //char& l = *(*(lab + i) + j);
+        char& tile{tiles[j][i]};
+           switch (tile)
            {
            case 'w':
                 Spritemaze.push_back(*tileWall1);
@@ -149,14 +179,65 @@ int main()
                break;
            }
         }
-    } 
+    } */
+//Maze
+    unsigned int N{10}, M{13};
+    Maze* maze1{new Maze(N, M, "assets/mazes/maze1.txt")};
 
-    sf::Clock* clock{new sf::Clock()};
-    float deltaTime{};
+    std::vector<Tile*>* maze{new std::vector<Tile*>()};
 
-    //Game inputs
-    Inputs* inputs{new Inputs()};
+    for(int i = 0; i < N; i++)
+    {
+        for(int j = 0; j < M; j++)
+        {
 
+            char& tile{maze1->GetTiles()[i][j]};
+
+            switch (tile)
+            {
+                case 'w':
+                    //maze.push_back(*tileWall_1_1);
+                    maze->push_back(new Tile(16 * 1, 16 * 1, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 'e':
+                    maze->push_back(new Tile(16 * 1, 16 * 2, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 'r':
+                    maze->push_back(new Tile(16 * 1, 16 * 3, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 'g':
+                    maze->push_back(new Tile(16 * 1, 16 * 4, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 'a':
+                    maze->push_back(new Tile(16 * 2, 16 * 4, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 's':
+                    maze->push_back(new Tile(16 * 3, 16 * 4, SPRITE_SCALE, 16, tilesTexture3));
+                    break;    
+                case 'd':
+                    maze->push_back(new Tile(16 * 4, 16 * 5, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 'i':
+                    maze->push_back(new Tile(16 * 4, 16 * 3, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 'k':
+                    maze->push_back(new Tile(16 * 4, 16 * 4, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 'u':
+                    maze->push_back(new Tile(16 * 3, 16 * 6, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 'c':
+                    maze->push_back(new Tile(16 * 2, 16 * 6, SPRITE_SCALE, 16, tilesTexture3));
+                    break;
+                case 'v':
+                    maze->push_back(new Tile(16 * 3, 16 * 6, SPRITE_SCALE, 16, tilesTexture3));
+                    break;              
+                default:
+                    break;
+            }
+            maze->back()->Move(tileBaseWidth * j, tileBaseHeight * i);
+        }
+    }
 
     //Main player
     Character* character1{new Character(tilesTexture2, 16 * 1, 16 * 5, 16, 16, SPRITE_SCALE, SPRITE_SCALE, world, window)};
@@ -276,10 +357,11 @@ int main()
 
         window->clear(*(new sf::Color(150, 100, 0, 255)));//limpiar la pantalla
         
-        for(auto& tile : Spritemaze)
+        for(auto& mazeTile : *maze)
         {
-            window->draw(tile);
+            window->draw(*mazeTile->GetSprite());
         }
+
 
         //character1Collider->GetBoxShape()->setPosition(character1->GetSprite()->getPosition());
 
@@ -299,7 +381,6 @@ int main()
         world->ClearForces();
         world->Step(1.f / 100 * deltaTime, 8, 8);
         clock->restart();
-
 
         //std::cout << "delta time: " << deltaTime << std::endl;
 
