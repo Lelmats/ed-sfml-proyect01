@@ -1,4 +1,3 @@
-// pragma once permite importar una cabecera (un archivo h o hh) muchas veces pero solo lo carga una vez.
 #pragma once
 #include<SFML/Graphics.hpp>
 

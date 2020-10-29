@@ -33,7 +33,8 @@ void Animation::Play(float& deltaTime)
             sprite->getTextureRect().width * currentFrame, 
             sprite->getTextureRect().height * cropPosY,  
             sprite->getTextureRect().width,  
-            sprite->getTextureRect().height))); 
+            sprite->getTextureRect().height)));
+               
         timer = 0.f;
     }
 }
