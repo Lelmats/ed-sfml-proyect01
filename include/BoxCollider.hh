@@ -18,7 +18,7 @@ class BoxCollider
         void InitShape();
         
     public:
-        BoxCollider(float, float, sf::Color*, float, float, Rigidbody*, sf::Sprite*);
+        BoxCollider(float, float, sf::Color*, float, float, Rigidbody*&, sf::Sprite*&);
         ~BoxCollider();
 
         sf::RectangleShape* GetBoxShape() const;

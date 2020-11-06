@@ -22,6 +22,8 @@ class GameObject
 
         const char* tagName{"default"};
 
+        bool debug{};
+
         void InitSprite(b2World*&, b2Vec2*, b2BodyType);
     public:
         GameObject(sf::Texture*&, float, float, float, float, float, float, b2Vec2*, b2BodyType, b2World*&, sf::RenderWindow*&);
@@ -32,4 +34,6 @@ class GameObject
         void SetPosition(float, float);
         const char* GetTagName() const;
         void SetTagName(const char*);
+        void SetDebug(bool);
+        bool GetDebug() const;
 };

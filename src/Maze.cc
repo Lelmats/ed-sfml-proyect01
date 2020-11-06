@@ -1,6 +1,6 @@
 #include "Maze.hh"
 
-Maze::Maze(unsigned int N, unsigned int M, float scale, float cropSize, sf::Texture*& texture, const char* path)
+Maze::Maze(unsigned int N, unsigned int M, float scale, float cropSize, sf::Texture*& texture, const char* path, b2World*& world)
 {
     this->N = N;
     this->M = M;
@@ -8,6 +8,7 @@ Maze::Maze(unsigned int N, unsigned int M, float scale, float cropSize, sf::Text
     this->cropSize = cropSize;
     this->texture = texture;
     this->path = path;
+    this->world = world;
     tiles = new char*[N];
     reader->open(path);
     AllocateMemory();
@@ -46,13 +47,16 @@ void Maze::Generate()
             switch (tile)
             {
                 case 'w':
-                    container->push_back(new Tile(cropSize * 1, cropSize * 1, scale, cropSize, texture));
+                    container->push_back(new Tile(cropSize * 1, cropSize * 1, scale, cropSize, texture, world));
+                    container->back()->TurnPhysicsOn(cropSize * scale * j, cropSize * scale * i);
                     break;
                 case 'e':
-                    container->push_back(new Tile(cropSize * 1, cropSize * 2, scale, cropSize, texture));
+                    container->push_back(new Tile(cropSize * 1, cropSize * 2, scale, cropSize, texture, world));
+                    container->back()->TurnPhysicsOn(cropSize * scale * j, cropSize * scale * i);
                     break;
                 case 'r':
-                    container->push_back(new Tile(cropSize * 1, cropSize * 3, scale, cropSize, texture));
+                    container->push_back(new Tile(cropSize * 1, cropSize * 3, scale, cropSize, texture, world));
+                    container->back()->TurnPhysicsOn(cropSize * scale * j, cropSize * scale * i);
                     break;
                 case 'g':
                     container->push_back(new Tile(cropSize * 1, cropSize * 4, scale, cropSize, texture));
@@ -80,11 +84,17 @@ void Maze::Generate()
                     break;
                 case 'v':
                     container->push_back(new Tile(cropSize * 3, cropSize * 6, scale, cropSize, texture));
-                    break;              
+                    break;     
+                /*case 'v':
+                    container->push_back(new Tile(cropSize * 3, cropSize * 6, scale, cropSize, texture, world));
+                    container->back()->TurnPhysicsOn(cropSize * scale * j, cropSize * scale * i);
+                    //container->back()->SetTagName("door");
+                    break;*/              
                 default:
                     break;
             }
             container->back()->Move(cropSize * scale * j, cropSize * scale * i);
+            
         }
     }
 }

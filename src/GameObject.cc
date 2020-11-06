@@ -20,6 +20,10 @@ float cropHeight, float scaleX, float scaleY, b2Vec2* position, b2BodyType bodyT
 
 GameObject::~GameObject()
 {
+    //delete sprite;
+    boxCollider->~BoxCollider();
+    /*delete sprite;
+    delete this;*/
 }
 
 void GameObject::InitSprite(b2World*& world, b2Vec2* position, b2BodyType bodyType)
@@ -47,7 +51,7 @@ void GameObject::Update()
 {
     boxCollider->UpdatePhysics();
     window->draw(*sprite);
-    window->draw(*boxCollider->GetBoxShape());
+    if(debug) window->draw(*boxCollider->GetBoxShape());
 }
 
 BoxCollider* GameObject::GetCollider() const
@@ -63,4 +67,14 @@ const char* GameObject::GetTagName() const
 void GameObject::SetTagName(const char* tagName)
 {
     this->tagName = tagName;
+}
+
+bool GameObject::GetDebug() const
+{
+    return debug;
+}
+
+void GameObject::SetDebug(bool debug)
+{
+    this->debug = debug;
 }
